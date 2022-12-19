@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Home</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="{{ url_for('static', filename = 'images/icon.jpg') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'css/bootstrap-select.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'css/custom.css') }}">
+    </head>
+    <body>
+        <div class="container-fluid" style="padding: 5px 70px 0 70px !important;">
+            <input
+                type="hidden"
+                id="tab_type"
+                name="tab_type"
+                value="{{ tab_type }}"
+            >
+            <div class="group-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active" id="predict_tab">
+                        <a
+                            href="#predict"
+                            aria-controls="predict"
+                            role="tab"
+                            data-toggle="tab"
+                        >Chẩn đoán</a>
+                    </li>
+                    <li role="presentation" id="accurancy_tab">
+                        <a
+                            href="#accurancy"
+                            aria-controls="accurancy"
+                            role="tab"
+                            data-toggle="tab"
+                        >Độ chính xác của mô hình</a>
+                    </li>
+                    <li role="presentation" id="train_tab">
+                        <a
+                            href="#train"
+                            aria-controls="train"
+                            role="tab"
+                            data-toggle="tab"
+                        >Huấn luyện mô hình</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="predict">
+                        <form
+                            name="predictForm"
+                            id="predictForm"
+                            action="{{ url_for('predict') }}"
+                            method="post"
+                        >
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>Mô hình sử dụng</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="Model_Name" class="form-label">Mô hình</label>
+                                    <br>
+                                    <select
+                                        id="Model_Name"
+                                        name="Model_Name"
+                                        class="selectpicker"
+                                        data-live-search="true"
+                                    >
+                                        <option value="1" selected>Logistic Regression</option>
+                                        <option value="2">Random Forest</option>
+                                        <option value="3">Support Vector Machine</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="Model_Name" class="form-label">Kết quả</label>
+                                    <br>
+                                    {% if error %}
+                                    <h4 style="color: red;">{{ error }}</h4>
+                                    {% endif %}
+                                    {% if value == None %}
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        name="result"
+                                        id="result"
+                                        value=""
+                                    >
+                                    {% elif value == 1 %}
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        name="result"
+                                        id="result"
+                                        value="Bạn có khả năng bị bệnh tim"
+                                        disabled
+                                    >
+                                    {% elif value == 0 or value == -1%}
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        name="result"
+                                        id="result"
+                                        value="Bạn không có khả năng bị bệnh tim"
+                                        disabled
+                                    >
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>Chẩn đoán khả năng mắc bệnh tim</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="Sex" class="form-label">Giới tính</label>
+                                    <select class="form-control form-control-sm" name="Sex" id="Sex">
+                                        <option value="1" selected>Nam</option>
+                                        <option value="0">Nữ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Age_Group" class="form-label">Nhóm Tuổi</label>
+                                    <select
+                                            id="Age_Group"
+                                            name="Age_Group"
+                                            class="selectpicker"
+                                            data-live-search="true"
+                                    >
+                                        <option value="1" selected>18 - 24</option>
+                                        <option value="2">25 - 29</option>
+                                        <option value="3">30 - 34</option>
+                                        <option value="4">35 - 39</option>
+                                        <option value="5">40 - 44</option>
+                                        <option value="6">45 - 49</option>
+                                        <option value="7">50 - 54</option>
+                                        <option value="8">55 - 59</option>
+                                        <option value="9">60 - 64</option>
+                                        <option value="10">65 - 69</option>
+                                        <option value="11">70 - 74</option>
+                                        <option value="12">75 - 79</option>
+                                        <option value="13">Lớn hơn 80</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="BMI" class="form-label">Chỉ số BMI</label>
+                                    <input
+                                        required
+                                        class="form-control form-control-sm"
+                                        type="number"
+                                        placeholder="Nhập chỉ số BMI"
+                                        name="BMI"
+                                        id="BMI"
+                                    >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Smoking">Đã hút ít nhất 100 điếu thuốc chưa?</label>
+                                    <select class="form-control form-control-sm" name="Smoking" id="Smoking">
+                                        <option value="1" selected>Rồi</option>
+                                        <option value="0">Chưa</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Alcohol">Có nghiện rượu/uống nhiều rượu không?</label>
+                                    <select class="form-control form-control-sm" name="Alcohol" id="Alcohol">
+                                        <option value="1" selected>Có</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Stroke">Đã từng bị đột quỵ chưa?</label>
+                                    <select class="form-control form-control-sm" name="Stroke" id="Stroke">
+                                        <option value="1" selected>Rồi</option>
+                                        <option value="0">Chưa</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Physical_Health">Số ngày sức khỏe thể chất không tốt?</label>
+                                    <input
+                                        required
+                                        class="form-control form-control-sm"
+                                        type="number"
+                                        placeholder="Nhập số ngày(0-30)"
+                                        name="Physical_Health"
+                                        id="Physical_Health"
+                                        min="0"
+                                        max="30"
+                                        step="1"
+                                    >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Mental_Health">Số ngày sức khỏe tinh thần không tốt?</label>
+                                    <input
+                                        required
+                                        class="form-control form-control-sm"
+                                        type="number"
+                                        placeholder="Nhập số ngày(0-30)"
+                                        name="Mental_Health"
+                                        id="Mental_Health"
+                                        min="0"
+                                        max="30"
+                                        step="1"
+                                    >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Difficulty_Walking">Có gặp khó khăn trong việc đi lại không?</label>
+                                    <select class="form-control form-control-sm" name="Difficulty_Walking" id="Difficulty_Walking">
+                                        <option value="1" selected>Có</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Diabetes">Có bị đái tháo đường chưa?</label>
+                                    <select class="form-control form-control-sm" name="Diabetes" id="Diabetes">
+                                        <option value="2" selected>Có</option>
+                                        <option value="1">Chỉ bị tiền đái tháo đường</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Physical_Activity">Có tập thể dục không?</label>
+                                    <select class="form-control form-control-sm" name="Physical_Activity" id="Physical_Activity">
+                                        <option value="1" selected>Có</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="General_Health">Sức khỏe tổng quát như thế nào?</label>
+                                    <select class="form-control form-control-sm" name="General_Health" id="General_Health">
+                                        <option value="1" selected>Xuất sắc</option>
+                                        <option value="2">Rất tốt</option>
+                                        <option value="3">Tốt</option>
+                                        <option value="4">Khá</option>
+                                        <option value="5">Tệ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Asthma">Có bị hen suyễn không?</label>
+                                    <select class="form-control form-control-sm" name="Asthma" id="Asthma">
+                                        <option value="1" selected>Có</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Kidney_Disease">Có bị bệnh về thận không?</label>
+                                    <select class="form-control form-control-sm" name="Kidney_Disease" id="Kidney_Disease">
+                                        <option value="1" selected>Có</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Skin_Cancer">Có bị ung thư da không?</label>
+                                    <select class="form-control form-control-sm" name="Skin_Cancer" id="Skin_Cancer">
+                                        <option value="1" selected>Có</option>
+                                        <option value="0">Không</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                                <div class="col-md-12 text-center">
+                                    <button
+                                        name="type"
+                                        value="predict"
+                                        type="submit"
+                                        class="btn btn-primary"
+                                    >Chẩn đoán</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="accurancy">
+                        <form
+                            name="accurancyForm"
+                            id="accurancyForm"
+                            action="{{ url_for('accurancy') }}"
+                            method="post"
+                        >
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-md-6">
+                                    <label for="Model_Name" class="form-label">Mô hình</label>
+                                    <br>
+                                    <select
+                                        id="Model_Name"
+                                        name="Model_Name"
+                                        class="selectpicker"
+                                        data-live-search="true"
+                                    >
+                                        <option value="1" selected>Logistic Regression</option>
+                                        <option value="2">Random Forest</option>
+                                        <option value="3">Support Vector Machine</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="My_Accurancy" class="form-label">Model</label>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        placeholder="Độ chính xác của model"
+                                        name="My_Accurancy"
+                                        id="My_Accurancy"
+                                        disabled
+                                        value="{{ My_Accurancy }}"
+                                    >
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="Sklearn_Accurancy" class="form-label">Sklearn</label>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        placeholder="Độ chính xác của sklearn"
+                                        name="Sklearn_Accurancy"
+                                        id="Sklearn_Accurancy"
+                                        disabled
+                                        value="{{ Sklearn_Accurancy }}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                                <div class="col-md-12 text-center">
+                                    <button
+                                        name="type"
+                                        value="accurancy"
+                                        type="submit"
+                                        class="btn btn-primary"
+                                    >So sánh</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="train">
+                        <form
+                            name="trainForm"
+                            id="trainForm"
+                            action="{{ url_for('train') }}"
+                            method="post"
+                        >
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-md-6">
+                                    <label for="Model_Name" class="form-label">Mô hình</label>
+                                    <br>
+                                    <select
+                                        id="Model_Name"
+                                        name="Model_Name"
+                                        class="selectpicker"
+                                        data-live-search="true"
+                                    >
+                                        <option value="1" selected>Logistic Regression</option>
+                                        <option value="2">Random Forest</option>
+                                        <option value="3">Support Vector Machine</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="Features" class="form-label">Các thuộc tính dùng để huấn luyện</label>
+                                    <br>
+                                    <select
+                                            id="Features"
+                                            name="Features"
+                                            class="selectpicker"
+                                            data-live-search="true" multiple
+                                    >
+                                        <option value="BMI" selected>BMI</option>
+                                        <option value="Smoking" selected>Smoking</option>
+                                        <option value="Alcohol" selected>Alcohol</option>
+                                        <option value="Stroke" selected>Stroke</option>
+                                        <option value="Physical_Health" selected>Physical_Health</option>
+                                        <option value="Mental_Health" selected>Mental_Health</option>
+                                        <option value="Difficulty_Walking" selected>Difficulty_Walking</option>
+                                        <option value="Sex" selected>Sex</option>
+                                        <option value="Age_Group" selected>Age_Group</option>
+                                        <option value="Diabetes" selected>Diabetes</option>
+                                        <option value="Physical_Activity" selected>Physical_Activity</option>
+                                        <option value="General_Health" selected>General_Health</option>
+                                        <option value="Asthma" selected>Asthma</option>
+                                        <option value="Kidney_Disease" selected>Kidney_Disease</option>
+                                        <option value="Skin_Cancer" selected>Skin_Cancer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                                <div class="col-md-12 text-center">
+                                    <button
+                                        name="type"
+                                        value="train"
+                                        type="submit"
+                                        class="btn btn-primary"
+                                    >Huấn luyện</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap-select.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+    </body>
+</html>
